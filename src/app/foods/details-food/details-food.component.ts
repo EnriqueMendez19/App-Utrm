@@ -24,7 +24,7 @@ export class DetailsFoodComponent implements OnInit{
   foodId: number = -1;
   food?:Food = {
     name: '',
-    descripcion: '',
+    description: '',
     image: '',
     category: '',
     price: 0
@@ -32,7 +32,12 @@ export class DetailsFoodComponent implements OnInit{
 
   ngOnInit(): void{
     this.foodId = Number(this.activedRoute.snapshot.params['id']);
-    this.food = this.foodService.getOne(this.foodId);
+    //this.food = this.foodService.getOne(this.foodId);
+    this.foodService.getOneFood(this.foodId).subscribe({
+      next:(value) => (this.food = value),
+      error: (e)=> console.error(e),
+      complete:()=> console.info('Complete')
+    })
     console.log(this.food);
   }
 

@@ -49,7 +49,7 @@ export class FormFoodComponent implements OnInit {
   activedRoute: ActivatedRoute = inject(ActivatedRoute);
   food?: Food = {
     name: '',
-    descripcion: '',
+    description: '',
     category: '',
     image: '',
     price: 0,
@@ -60,16 +60,33 @@ export class FormFoodComponent implements OnInit {
       this.edit = true;
       this.foodId = Number(this.activedRoute.snapshot.params['id']);
       console.log(this.foodId);
-      this.food = this.serviceFood.getOne(this.foodId);
+      //this.food = this.serviceFood.getOne(this.foodId);
+      this.serviceFood.getOneFood(this.foodId).subscribe({
+        next:(value)=> this.updateForm(value),
+        error:(e)=> console.error(e),
+        complete: ()=> console.info('complete')
+      })
       if(this.food){
         this.form.setValue({
           name: this.food.name,
-          description: this.food.descripcion,
+          description: this.food.description,
           image: this.food.image,
           category: this.food.category,
           price: this.food.price.toString()
         });
       }
+    }
+  }
+
+  public updateForm(food:Food):void {
+    if(food){
+      this.form.patchValue({
+        name:food.name,
+        category:food.category,
+        description:food.description,
+        image:food.image,
+        price:food.price.toString()
+      })
     }
   }
 
@@ -86,14 +103,19 @@ export class FormFoodComponent implements OnInit {
         let comida: Food = {
           id: this.foodId,
           name: this.name?.value,
-          descripcion: this.description?.value,
+          description: this.description?.value,
           category: this.category?.value,
           image: this.image?.value,
           price: priceNumber
         };
         console.log(comida);
-        this.serviceFood.updateFood(comida);
-        this.router.navigate(['/food/food-list']);
+        //this.serviceFood.updateFood(comida);
+        this.serviceFood.addFood(comida).subscribe({
+        next:(value)=> (this.food = value),
+        error:(e)=> console.error(e),
+        complete: ()=> this.router.navigate(['/food/food-list'])
+        })
+        
       }
     }
   }
@@ -110,13 +132,18 @@ export class FormFoodComponent implements OnInit {
         let priceNumber = Number(this.price.value);
         let comida: Food = {
           name: this.name?.value,
-          descripcion: this.description?.value,
+          description: this.description?.value,
           category: this.category?.value,
           image: this.image?.value,
           price: priceNumber,
         };
         console.log(comida);
-        this.serviceFood.addFood(comida);
+        //this.serviceFood.addFood(comida);
+        this.serviceFood.addFood(comida).subscribe({
+          next:(value)=> (this.food = value),
+          error:(e)=> console.error(e),
+          complete: ()=> console.info('complete')
+          })
         this.router.navigate(['/food/food-list']);
       }
     }
